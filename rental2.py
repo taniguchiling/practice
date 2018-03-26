@@ -1,5 +1,8 @@
+# -*- coding: utf-8 -*-
+
 import tkinter as tk
 from tkinter.filedialog import askopenfilename
+import tkinter.messagebox
 import csv
 # import pandas as pd
 
@@ -24,7 +27,7 @@ csv_open = ""
 def open_csv_data():
     global csv_open
 
-    csv_open = open(csv_file_path, newline="")
+    csv_open = open(csv_file_path, newline="", encoding="UTF-8")
     with csv_open as file:
         reader = csv.reader(file)
         r = 3
@@ -59,6 +62,10 @@ def add_window():
     sato_entry = tk.Entry(add_win)
     sato_entry.grid(row=3, column=1)
 
+    # 追加完了時のメッセージ表示のダイアログボックス
+    def add_messagebox():
+        tk.messagebox.showinfo("追加完了", "追加しました。")
+
     def add_data():
         global csv_open
 
@@ -71,11 +78,13 @@ def add_window():
         # 値をリスト化する
         add_list = [num, tanaka, inoue, sato]
 
-        csv_open = open(csv_file_path, "a", newline="")
+        csv_open = open(csv_file_path, "a", newline="", encoding="UTF-8")
         file = csv_open
         writer = csv.writer(file, lineterminator="\n")
         writer.writerow(add_list)
         file.close()
+
+        add_messagebox()
 
     button = tk.Button(add_win, text="追加", command=add_data)
     button.grid(row=3, column=2)
