@@ -6,6 +6,8 @@ os.chdir('/Users/Yusuke/Documents/Python/materials')
 root = Tk()
 root.title("Book")
 
+f0 = Frame(root)
+
 wb = px.load_workbook('library.xlsx')
 ws = wb.get_sheet_by_name('Library')
 
@@ -13,7 +15,7 @@ list1 = []
 list2 = []
 list3 = []
 
-for col in range(1, 3000):
+for col in range(1, 3716):
     list1.append(ws.cell(col, 2).value)
     list2.append(ws.cell(col, 3).value)
     list3.append(ws.cell(col, 15).value)
@@ -35,7 +37,7 @@ EditBox3.pack()
 
 def func1():
     value1 = EditBox1.get()
-    for i in range(0, 2000):
+    for i in range(0, 3715):
         index = list2[i].find(value1)
         if index != -1:
             if list3[i] == "貸出中":
@@ -55,8 +57,12 @@ def func3():
     ws.cell(row=int(value1), column=15).value = ""
     wb.save("library.xlsx")
 
-Button(text = "検索", command = func1).pack()
-Button(text = "貸出", command = func2).pack()
-Button(text = "返却", command = func3).pack()
+
+
+Button(f0, text = "検索", command = func1).pack(in_ = f0, side = LEFT)
+Button(f0, text = "貸出", command = func2).pack(in_ = f0, side = RIGHT)
+Button(f0, text = "返却", command = func3).pack()
+
+f0.pack(fill = BOTH)
 
 root.mainloop()
