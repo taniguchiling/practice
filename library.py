@@ -1,7 +1,8 @@
 from tkinter import *
-import openpyxl as px, os
+import openpyxl as px
+# import os
 
-os.chdir('/Users/Yusuke/Documents/Python/materials')
+# os.chdir('/Users/Yusuke/Documents/Python/materials')
 
 root = Tk()
 root.title("Book")
@@ -35,7 +36,8 @@ EditBox3 = Entry()
 EditBox3.insert(END,"名前")
 EditBox3.pack()
 
-def func1():
+
+def search():
     value1 = EditBox1.get()
     for i in range(0, 3715):
         index = list2[i].find(value1)
@@ -45,23 +47,24 @@ def func1():
             else:
                 tx.insert(END, str(i+1) + "：" + str(list1[i]) + "：" + list2[i] + "\n\n")
 
-def func2():
+
+def borrow():
     value2 = EditBox2.get()
     value3 = EditBox3.get()
     ws.cell(row=int(value2), column=15).value = "貸出中"
     ws.cell(row=int(value2), column=16).value = value3
     wb.save("library.xlsx")
 
-def func3():
+
+def returning():
     value1 = EditBox2.get()
     ws.cell(row=int(value1), column=15).value = ""
     wb.save("library.xlsx")
 
 
-
-Button(f0, text = "検索", command = func1).pack(in_ = f0, side = LEFT)
-Button(f0, text = "貸出", command = func2).pack(in_ = f0, side = RIGHT)
-Button(f0, text = "返却", command = func3).pack()
+Button(f0, text = "検索", command = search).pack(in_ = f0, side = LEFT)
+Button(f0, text = "貸出", command = borrow).pack(in_ = f0, side = RIGHT)
+Button(f0, text = "返却", command = returning).pack()
 
 f0.pack(fill = BOTH)
 
