@@ -1,7 +1,7 @@
 from tkinter import *
 from tkinter.filedialog import askopenfilename
 import openpyxl as px
-# import os
+import os
 
 # os.chdir('/Users/Yusuke/Documents/Python/materials')
 
@@ -16,6 +16,7 @@ f2 = Frame(root)
 file_path = ""
 
 
+# 任意の場所からファイルを読み込む
 def import_data():
     global v
     global file_path
@@ -24,6 +25,7 @@ def import_data():
     v.set(file_path)
 
 
+# ファイルを開く
 def open_data():
     global wb
     global ws
@@ -40,21 +42,17 @@ def open_data():
         list2.append(ws.cell(col, 3).value)
         list3.append(ws.cell(col, 15).value)
 
+    # 開いているファイルの名前が表示されるようにする
+    file_name = os.path.splitext(os.path.basename(file_path))
+    Label(root, text=file_name).grid(row=1, column=4, columnspan=2, sticky=N+W)
+
 
 search_box = Entry()
 search_box.insert(END, "")
 search_box.grid(row=1, column=1, sticky=E)
 
 tx = Text()
-tx.grid(row=2, column=0, columnspan=3)
-
-book_number_box = Entry()
-book_number_box.insert(END, "書籍番号")
-book_number_box.grid(row=3, column=0, columnspan=2, sticky=W)
-
-Book_name_box = Entry()
-Book_name_box.insert(END, "名前")
-Book_name_box.grid(row=4, column=0, columnspan=2, sticky=W)
+tx.grid(row=2, column=0, columnspan=2)
 
 
 def search():
@@ -68,18 +66,32 @@ def search():
                 tx.insert(END, str(i+1) + "：" + str(list1[i]) + "：" + list2[i] + "\n\n")
 
 
-def borrow():
-    value2 = book_number_box.get()
-    value3 = Book_name_box.get()
-    ws.cell(row=int(value2), column=15).value = "貸出中"
-    ws.cell(row=int(value2), column=16).value = value3
-    wb.save("library.xlsx")
+# 新しいウインドウを作り、そこで貸出と返却の処理をするためのウィジェットを配置する
+def borrow_window():
+    borrow_win = Toplevel()
 
+    book_number_box = Entry(borrow_win)
+    book_number_box.insert(END, "書籍番号")
+    book_number_box.grid(row=0, column=0, columnspan=2)
 
-def returning():
-    value1 = book_number_box.get()
-    ws.cell(row=int(value1), column=15).value = ""
-    wb.save("library.xlsx")
+    book_name_box = Entry(borrow_win)
+    book_name_box.insert(END, "名前")
+    book_name_box.grid(row=1, column=0, columnspan=2)
+
+    def borrow():
+        value2 = book_number_box.get()
+        value3 = book_name_box.get()
+        ws.cell(row=int(value2), column=15).value = "貸出中"
+        ws.cell(row=int(value2), column=16).value = value3
+        wb.save("library.xlsx")
+
+    def returning():
+        value1 = book_number_box.get()
+        ws.cell(row=int(value1), column=15).value = ""
+        wb.save("library.xlsx")
+
+    Button(borrow_win, text="貸出", command=borrow).grid(row=2, column=0, sticky=E)
+    Button(borrow_win, text="返却", command=returning).grid(row=2, column=1, sticky=W)
 
 
 # 親フレームのウィジェット配置
@@ -87,11 +99,9 @@ Label(root, text='パス: ').grid(row=0, column=3)
 v = StringVar()
 entry = Entry(root, textvariable=v).grid(row=0, column=4)
 Button(root, text="参照", command=import_data).grid(row=0, column=5)
-Button(root, text="開く", command = open_data).grid(row=1, column=5)
-Button(root, text = "検索", command = search).grid(row=1, column=2, sticky=W)
-Button(root, text = "貸出", command = borrow).grid(row=5, column=0, sticky=E)
-Button(root, text = "返却", command = returning).grid(row=5, column=1, sticky=W)
-
+Button(root, text="開く", command=open_data).grid(row=1, column=5)
+Button(root, text="検索", command=search).grid(row=1, column=2, sticky=W)
+Button(root, text="貸出/返却", command=borrow_window).grid(row=3, column=1, padx=10, pady=10, sticky=E)
 root.mainloop()
 
 # フレームでレイアウトを整理する
