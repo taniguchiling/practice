@@ -50,11 +50,11 @@ tx.grid(row=2, column=0, columnspan=3)
 
 book_number_box = Entry()
 book_number_box.insert(END, "書籍番号")
-book_number_box.grid(row=3, column=0, columnspan=2, pady=5)
+book_number_box.grid(row=3, column=0, columnspan=2, sticky=W)
 
 Book_name_box = Entry()
 Book_name_box.insert(END, "名前")
-Book_name_box.grid(row=4, column=0, columnspan=2)
+Book_name_box.grid(row=4, column=0, columnspan=2, sticky=W)
 
 
 def search():
