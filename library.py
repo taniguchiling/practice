@@ -66,17 +66,32 @@ def search():
                 tx.insert(END, str(i+1) + "：" + str(list1[i]) + "：" + list2[i] + "\n\n")
 
 
+
+
+
 # 新しいウインドウを作り、そこで貸出と返却の処理をするためのウィジェットを配置する
 def borrow_window():
     borrow_win = Toplevel()
+
+    def delete_number(event):
+        # エントリーの中身を削除
+        book_number_box.delete(0, END)
+
+    def delete_name(event):
+        # エントリーの中身を削除
+        book_name_box.delete(0, END)
 
     book_number_box = Entry(borrow_win)
     book_number_box.insert(END, "書籍番号")
     book_number_box.grid(row=0, column=0, columnspan=2)
 
+    book_number_box.bind("<Button-1>", delete_number)
+
     book_name_box = Entry(borrow_win)
     book_name_box.insert(END, "名前")
     book_name_box.grid(row=1, column=0, columnspan=2)
+
+    book_name_box.bind("<Button-1>", delete_name)
 
     def borrow():
         value2 = book_number_box.get()
