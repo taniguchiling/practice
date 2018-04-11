@@ -1,123 +1,84 @@
 from tkinter import *
-from tkinter.filedialog import askopenfilename
-import openpyxl as px
-import os
+from tkinter import ttk
+import openpyxl as px, os
 
-# os.chdir('/Users/Yusuke/Documents/Python/materials')
+os.chdir('/Users/Yusuke/Documents/Python/materials')
 
-root = Tk()
-root.title("Book")
+wb = px.load_workbook('library.xlsx')
+ws = wb.get_sheet_by_name('Library')
 
-# フレームの生成
-f0 = Frame(root)
-f1 = Frame(root)
-f2 = Frame(root)
+list2 = []
+list3 = []
+list4 = []
 
-file_path = ""
+for col in range(1, 3716):
+    list2.append(ws.cell(col, 3).value)
+    list3.append(ws.cell(col, 15).value)
 
-
-# 任意の場所からファイルを読み込む
-def import_data():
-    global v
-    global file_path
-    file_path = askopenfilename()
-    print(file_path)
-    v.set(file_path)
-
-
-# ファイルを開く
-def open_data():
-    global wb
-    global ws
-    global list1, list2, list3
-    wb = px.load_workbook(file_path)
-    ws = wb.get_sheet_by_name('Library')
-
-    list1 = []
-    list2 = []
-    list3 = []
-
-    for col in range(1, 3716):
-        list1.append(ws.cell(col, 2).value)
-        list2.append(ws.cell(col, 3).value)
-        list3.append(ws.cell(col, 15).value)
-
-    # 開いているファイルの名前が表示されるようにする
-    file_name = os.path.splitext(os.path.basename(file_path))
-    Label(root, text=file_name).grid(row=1, column=4, columnspan=2, sticky=N+W)
-
-
-search_box = Entry()
-search_box.insert(END, "")
-search_box.grid(row=1, column=1, sticky=E)
-
-tx = Text()
-tx.grid(row=2, column=0, columnspan=2)
-
-
-def search():
-    value1 = search_box.get()
+def button_click1():
+    lb.delete(0, END)
+    value1 = EditBox1.get()
     for i in range(0, 3715):
         index = list2[i].find(value1)
         if index != -1:
             if list3[i] == "貸出中":
-                tx.insert(END, "貸出中：" + str(i+1) + "：" + str(list1[i]) + "：" + list2[i] + "\n\n")
+                lb.insert(END, "貸出中：" + list2[i])
             else:
-                tx.insert(END, str(i+1) + "：" + str(list1[i]) + "：" + list2[i] + "\n\n")
+                lb.insert(END, list2[i])
 
+def listbox_selected(event):
+    show_selection()
 
+def show_selection():
+    for i in lb.curselection():
+        value2 = lb.get(i)
+        list4.append(value2)
 
+def button_click2():
+    value2 = EditBox2.get()
+    for i in range(0, 3715):
+        if list2[i] == list4[-1]:
+            ws.cell(row=i+1, column=15).value = "貸出中"
+            ws.cell(row=i+1, column=16).value = value2
+            wb.save("library.xlsx")
 
+def button_click3():
+    for i in range(0, 3715):
+        if "貸出中：" + list2[i] == list4[-1]:
+            ws.cell(row=i+1, column=15).value = ""
+            ws.cell(row=i+1, column=16).value = ""
+            wb.save("library.xlsx")
 
-# 新しいウインドウを作り、そこで貸出と返却の処理をするためのウィジェットを配置する
-def borrow_window():
-    borrow_win = Toplevel()
+if __name__ == '__main__':
+    root = Tk()
+    root.title('谷口ラボ')
 
-    def delete_number(event):
-        # エントリーの中身を削除
-        book_number_box.delete(0, END)
+    frame1 = ttk.Frame(root, padding=10)
+    frame1.grid()
 
-    def delete_name(event):
-        # エントリーの中身を削除
-        book_name_box.delete(0, END)
+    frame2 = ttk.Frame(root, padding=10)
+    frame2.grid()
 
-    book_number_box = Entry(borrow_win)
-    book_number_box.insert(END, "書籍番号")
-    book_number_box.grid(row=0, column=0, columnspan=2)
+    button1 = ttk.Button(frame2, text='検索', command=button_click1)
+    button1.grid(row=0, column=1)
 
-    book_number_box.bind("<Button-1>", delete_number)
+    button2 = ttk.Button(frame2, text='貸出', command=button_click2)
+    button2.grid(row=0, column=4)
 
-    book_name_box = Entry(borrow_win)
-    book_name_box.insert(END, "名前")
-    book_name_box.grid(row=1, column=0, columnspan=2)
+    button3 = ttk.Button(frame2, text='返却', command=button_click3)
+    button3.grid(row=0, column=5)
 
-    book_name_box.bind("<Button-1>", delete_name)
+    lb = Listbox(frame1, width =42, height=10)
+    lb.insert(END)
+    lb.bind('<<ListboxSelect>>', listbox_selected)
+    lb.grid(row=0, column=0)
 
-    def borrow():
-        value2 = book_number_box.get()
-        value3 = book_name_box.get()
-        ws.cell(row=int(value2), column=15).value = "貸出中"
-        ws.cell(row=int(value2), column=16).value = value3
-        wb.save("library.xlsx")
+    EditBox1 = ttk.Entry(frame2)
+    EditBox1.insert(END, "")
+    EditBox1.grid(row=1, column=0, columnspan=3)
 
-    def returning():
-        value1 = book_number_box.get()
-        ws.cell(row=int(value1), column=15).value = ""
-        wb.save("library.xlsx")
+    EditBox2 = ttk.Entry(frame2)
+    EditBox2.insert(END, "")
+    EditBox2.grid(row=1, column=3, columnspan=3)
 
-    Button(borrow_win, text="貸出", command=borrow).grid(row=2, column=0, sticky=E)
-    Button(borrow_win, text="返却", command=returning).grid(row=2, column=1, sticky=W)
-
-
-# 親フレームのウィジェット配置
-Label(root, text='パス: ').grid(row=0, column=3)
-v = StringVar()
-entry = Entry(root, textvariable=v).grid(row=0, column=4)
-Button(root, text="参照", command=import_data).grid(row=0, column=5)
-Button(root, text="開く", command=open_data).grid(row=1, column=5)
-Button(root, text="検索", command=search).grid(row=1, column=2, sticky=W)
-Button(root, text="貸出/返却", command=borrow_window).grid(row=3, column=1, padx=10, pady=10, sticky=E)
-root.mainloop()
-
-# フレームでレイアウトを整理する
-# ファイルを開くのと貸し出しの処理は別ウインドウでいいかも
+    root.mainloop()
